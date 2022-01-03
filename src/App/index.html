@@ -1,21 +1,46 @@
 <!-- 顶点着色器 -->
 <script type='x-shader/x-vertex' id='vs'>
-  attribute vec4 a_position;
+  attribute vec3 a_position; // 顶点坐标
+  uniform mat4 u_matrix; // 变换矩阵
+  uniform vec3 u_LPosition; // 光的位置
+  attribute vec3 a_normal;
+
+  varying vec3 v_LDirection;
   varying vec3 v_normal;
-  uniform mat4 u_matrix;
+
   void main(){
-      gl_Position=u_matrix * a_position;
-      // 因为位置是以几何中心为原点的,可以用顶点坐标作为法向量
-      v_normal=normalize(a_position.xyz);
+
+    // 坐标新增齐次坐标，为了和矩阵对齐
+    gl_Position=u_matrix * vec4(a_position,1);
+
+    // 点光源方向计算：点光源方向 = 点光源坐标 - 顶点坐标
+    // 顶点的位置应该使用计算过的
+    v_LDirection=u_LPosition-gl_Position.xyz;
+
+    v_normal=a_normal;
+
   }
 </script>
 
 <!-- 片段着色器 -->
 <script type='x-shader/x-fragment' id='fs'>
   precision mediump float;
-  uniform vec4 u_color;
+  uniform vec4 u_LColor;  // 光颜色
+  uniform vec4 u_color; // 顶点颜色
+  varying vec3 v_LDirection; // 光线方向
+  varying vec3 v_normal; // 法线方向
+
   void main(){
-      gl_FragColor=u_color;
+
+    // 先对方向进行序列化，使得向量长度为1
+    vec3 LDirection=normalize(v_LDirection);
+    vec3 normal=normalize(v_normal);
+
+    // 计算序列化后的光方向和法线方向的点乘
+    float dotValue=max(dot(LDirection,normal),0.0);
+
+    gl_FragColor=u_color*u_LColor*dotValue;
+
   }
 </script>
 

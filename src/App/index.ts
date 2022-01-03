@@ -28,7 +28,7 @@ export default class {
         let buffer = image3d.Buffer()
         let camera = image3d.Camera({
             size: 4
-        })
+        }).rotateBody(2, 0, 1, 0).rotateBody(-0.5, 1, 0, 0)
 
         let colors = {
             12: [0.5, 0.5, 0.5],
@@ -48,6 +48,10 @@ export default class {
             56: [0, 0.4, 0]
         }
 
+        // 设置点光源的颜色和位置
+        image3d.setUniformFloat("u_LColor", 1, 1, 1, 1)
+        image3d.setUniformFloat("u_LPosition", 10, 10, 10)
+
         let doDraw = function () {
             image3d.setUniformMatrix("u_matrix", camera.value())
             for (let index = 0; index < model.geometries.length; index++) {
@@ -55,7 +59,24 @@ export default class {
                 image3d.setUniformFloat("u_color", ...(colors[index] || [0.8, 0.8, 0.8]), 1)
 
                 let position = model.geometries[index].data.attributes.position.array
-                buffer.write(new Float32Array(position)).use('a_position', 3, 3, 0)
+                let normal = model.geometries[index].data.attributes.normal.array
+
+                let data = []
+                for (let i = 0; i < position.length; i += 3) {
+
+                    data.push(position[i])
+                    data.push(position[i + 1])
+                    data.push(position[i + 2])
+
+                    data.push(normal[i])
+                    data.push(normal[i + 1])
+                    data.push(normal[i + 2])
+
+                }
+
+                buffer.write(new Float32Array(data))
+                    .use('a_position', 3, 6, 0)
+                    .use('a_normal', 3, 6, 3)
 
                 painter.drawTriangle(0, position.length / 3)
 
@@ -70,13 +91,13 @@ export default class {
 
             // 修改相机
             if (data.type == 'lookUp') {
-                camera.rotateBody(deg, -1, 0, 0)
-            } else if (data.type == 'lookDown') {
                 camera.rotateBody(deg, 1, 0, 0)
+            } else if (data.type == 'lookDown') {
+                camera.rotateBody(deg, -1, 0, 0)
             } else if (data.type == 'lookLeft') {
-                camera.rotateBody(deg, 0, -1, 0)
-            } else if (data.type == 'lookRight') {
                 camera.rotateBody(deg, 0, 1, 0)
+            } else if (data.type == 'lookRight') {
+                camera.rotateBody(deg, 0, -1, 0)
             }
 
             // 重新绘制
