@@ -3,6 +3,8 @@ import { Component } from 'nefbl'
 import model from './model.json'
 import image3D from 'image3d'
 
+import viewHandler from '@hai2007/browser/viewHandler.js'
+
 import style from './index.scss'
 import template from './index.html'
 
@@ -46,10 +48,8 @@ export default class {
             56: [0, 0.4, 0]
         }
 
-        setInterval(function () {
-
-            image3d.setUniformMatrix("u_matrix", camera.rotateBody(0.03, -1, 1, 0, 1, -1, 0).value())
-
+        let doDraw = function () {
+            image3d.setUniformMatrix("u_matrix", camera.value())
             for (let index = 0; index < model.geometries.length; index++) {
 
                 image3d.setUniformFloat("u_color", ...(colors[index] || [0.8, 0.8, 0.8]), 1)
@@ -60,8 +60,28 @@ export default class {
                 painter.drawTriangle(0, position.length / 3)
 
             }
+        }
+        doDraw()
 
-        }, 20)
+        // 每次调整的弧度
+        let deg = 0.1
+
+        viewHandler(data => {
+
+            // 修改相机
+            if (data.type == 'lookUp') {
+                camera.rotateBody(deg, -1, 0, 0)
+            } else if (data.type == 'lookDown') {
+                camera.rotateBody(deg, 1, 0, 0)
+            } else if (data.type == 'lookLeft') {
+                camera.rotateBody(deg, 0, -1, 0)
+            } else if (data.type == 'lookRight') {
+                camera.rotateBody(deg, 0, 1, 0)
+            }
+
+            // 重新绘制
+            doDraw()
+        })
 
     }
 
