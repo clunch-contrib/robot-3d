@@ -1,3 +1,22 @@
 canvas {
-    background-color: #000000;
+    margin-top: calc(50vh - 250px);
+    margin-left: calc(50vw - 250px);
+}
+
+.fork {
+    user-select: none;
+    position: fixed;
+    transform: rotate(45deg);
+    line-height: 1.6em;
+    transform-origin: 150px 23px;
+    text-align: center;
+    font-family: sans-serif;
+    display: inline-block;
+    bottom: 53px;
+    left: -91px;
+    width: 300px;
+    background-color: #b25932;
+    outline: 4px solid #b25932;
+    border: 2px dashed #ffffff;
+    color: #ffffff;
 }

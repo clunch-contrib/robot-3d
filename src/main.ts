@@ -14,7 +14,11 @@ platform({
     el: document.getElementById('root'),
 
     // 全局样式
-    styles: [normalize]
+    styles: [normalize, `
+        body {
+            background-color: #000000;
+        }
+    `]
 
 })
 
