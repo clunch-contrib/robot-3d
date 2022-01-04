@@ -39,3 +39,37 @@ canvas {
         }
     }
 }
+
+.process {
+    color: white;
+    top: calc(50vh - 25px);
+    left: calc(50vw - 250px);
+    position: fixed;
+    text-align: center;
+    width: 500px;
+    height: 50px;
+
+    &>span {
+        &.icon {
+            border: 2px solid gray;
+            border-radius: 10px;
+            width: 300px;
+            height: 24px;
+            padding: 2px;
+            display: inline-block;
+            text-align: left;
+            margin-bottom: 10px;
+
+            &>i {
+                background-color: #73c944;
+                display: inline-block;
+                height: 16px;
+                border-radius: 10px;
+            }
+        }
+    }
+
+    &[load='yes'] {
+        display: none;
+    }
+}

@@ -10,6 +10,7 @@
     "@hai2007/browser": "^0.3.0",
     "@hai2007/polyfill": "^0.2.0",
     "@hai2007/style": "^0.3.0",
+    "@hai2007/xhr": "^0.1.2",
     "image3d": "^3.2.4",
     "nefbl": "^0.2.6",
     "sprout-ui": "^0.2.2"

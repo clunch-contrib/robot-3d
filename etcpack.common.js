@@ -26,11 +26,6 @@ module.exports = {
             if (/node_modules/.test(this.filepath) && !/sprout-ui/.test(this.filepath)) return source;
             return require('@babel/core').transformFileSync(this.filepath, require('./babel.config')).code;
         }]
-    }, {
-        test: /\.json$/,
-        handler: [function (source) {
-            return "export default " + source;
-        }]
     }],
 
     plug: [

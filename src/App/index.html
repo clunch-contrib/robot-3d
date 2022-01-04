@@ -56,3 +56,11 @@
         实现，用于探索模型数据等技术）
     </div>
 </div>
+
+<div class="process" ui-bind:load='hadLoad?"yes":"no"'>
+    <span class='icon'>
+        <i ui-bind:style='"width:"+process+"%"'></i>
+    </span>
+    <br />
+    <span ui-bind='"模型数据载入中："+process+"%"'></span>
+</div>

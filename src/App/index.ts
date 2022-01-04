@@ -1,6 +1,6 @@
-import { Component } from 'nefbl'
+import { Component, ref } from 'nefbl'
+import xhr from '@hai2007/xhr'
 
-import model from './model.json'
 import image3D from 'image3d'
 
 import viewHandler from '@hai2007/browser/viewHandler.js'
@@ -15,7 +15,49 @@ import template from './index.html'
 })
 export default class {
 
+    process: number
+    hadLoad: boolean
+
+    $setup() {
+        return {
+            process: ref(0),
+            hadLoad: ref(false)
+        }
+    }
+
     $mounted() {
+
+        xhr({
+
+            method: "GET",
+            url: "./model.json",
+            timeout: 600000,
+            xhr: () => {
+                let xmlhttp = new XMLHttpRequest()
+                xmlhttp.onprogress = data => {
+                    this.process = +((data.loaded / 6112727) * 100).toFixed(2)
+                }
+                return xmlhttp
+            }
+
+        }, (data) => {
+
+            this.hadLoad = true
+
+            // 成功回调
+            this.doit(JSON.parse(data.data))
+
+        }, (error) => {
+
+            // 错误回调
+            console.error(error)
+            alert('载入出错，请刷新浏览器重试~')
+
+        });
+
+    }
+
+    doit(model) {
 
         // 创建3D对象并配置好画布和着色器
         let image3d = new image3D(document.getElementsByTagName('canvas')[0], {
