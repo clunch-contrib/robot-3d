@@ -70,7 +70,7 @@ export default class {
         let buffer = image3d.Buffer()
         let camera = image3d.Camera({
             size: 4
-        }).rotateBody(2, 0, 1, 0).rotateBody(-0.5, 1, 0, 0)
+        }).moveBody(0.5,0,-1,0).rotateBody(2, 0, 1, 0).rotateBody(-0.5, 1, 0, 0)
 
         let colors = {
             12: [0.5, 0.5, 0.5],
@@ -148,7 +148,7 @@ export default class {
 
             // 鼠标控制
             else if (data.type == 'rotate') {
-                camera.rotateBody(deg * 0.3, ...data.normal)
+                camera.rotateBody(deg * data.dist*0.07, ...data.normal)
             }
 
             // 重新绘制
