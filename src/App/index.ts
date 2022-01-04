@@ -131,7 +131,11 @@ export default class {
 
         viewHandler(data => {
 
-            // 修改相机
+            /*
+             * 修改相机
+             */
+
+            // 键盘控制
             if (data.type == 'lookUp') {
                 camera.rotateBody(deg, 1, 0, 0)
             } else if (data.type == 'lookDown') {
@@ -140,6 +144,11 @@ export default class {
                 camera.rotateBody(deg, 0, 1, 0)
             } else if (data.type == 'lookRight') {
                 camera.rotateBody(deg, 0, -1, 0)
+            }
+
+            // 鼠标控制
+            else if (data.type == 'rotate') {
+                camera.rotateBody(deg * 0.3, ...data.normal)
             }
 
             // 重新绘制

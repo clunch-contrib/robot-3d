@@ -2936,7 +2936,10 @@ var _class = (_dec = Component({
 
       var deg = 0.1;
       viewHandler(function (data) {
-        // 修改相机
+        /*
+         * 修改相机
+         */
+        // 键盘控制
         if (data.type == 'lookUp') {
           camera.rotateBody(deg, 1, 0, 0);
         } else if (data.type == 'lookDown') {
@@ -2945,6 +2948,9 @@ var _class = (_dec = Component({
           camera.rotateBody(deg, 0, 1, 0);
         } else if (data.type == 'lookRight') {
           camera.rotateBody(deg, 0, -1, 0);
+        } // 鼠标控制
+        else if (data.type == 'rotate') {
+          camera.rotateBody.apply(camera, [deg * 0.3].concat(_toConsumableArray(data.normal)));
         } // 重新绘制
 
 
@@ -3061,6 +3067,7 @@ __etcpack__scope_bundle__.default= function (callback) {
 
     var el = document.getElementsByTagName('body')[0];
 
+    // 键盘控制
     xhtml.bind(el, 'keydown', function (event) {
         var keyCode = getKeyString(event);
 
@@ -3092,6 +3099,40 @@ __etcpack__scope_bundle__.default= function (callback) {
             });
         }
 
+    });
+
+    // 鼠标控制
+    var mouseP = null;
+    xhtml.bind(el, 'mousedown', function (event) {
+        mouseP = xhtml.mousePosition(el, event);
+    });
+    xhtml.bind(el, 'mouseup', function (event) {
+        mouseP = null;
+    });
+    xhtml.bind(el, 'mousemove', function (event) {
+        if (mouseP == null) return;
+
+        var tempMouseP = xhtml.mousePosition(el, event);
+
+        // 先求解出轨迹向量
+        var normal = [tempMouseP.x - mouseP.x, mouseP.y - tempMouseP.y];
+
+        // 方向向量旋转90deg得到选择向量
+        var rotateNormal = [
+            normal[1],
+            normal[0] * -1,
+            0
+        ]
+
+        // 非法射线忽略
+        if (rotateNormal[0] == 0 && rotateNormal[1] == 0) return;
+
+        callback({
+            type: "rotate",
+            normal: rotateNormal
+        });
+
+        mouseP = tempMouseP;
     });
 
 };
@@ -3522,7 +3563,7 @@ window.__etcpack__bundleSrc__['24']=function(){
 window.__etcpack__bundleSrc__['25']=function(){
     var __etcpack__scope_bundle__={};
     var __etcpack__scope_args__;
-    __etcpack__scope_bundle__.default= "<!-- 顶点着色器 -->\n<script type='x-shader/x-vertex' id='vs'>\n  attribute vec3 a_position; // 顶点坐标\n  uniform mat4 u_matrix; // 变换矩阵\n  uniform vec3 u_LPosition; // 光的位置\n  attribute vec3 a_normal;\n\n  varying vec3 v_LDirection;\n  varying vec3 v_normal;\n\n  void main(){\n\n    // 坐标新增齐次坐标，为了和矩阵对齐\n    gl_Position=u_matrix * vec4(a_position,1);\n\n    // 点光源方向计算：点光源方向 = 点光源坐标 - 顶点坐标\n    // 顶点的位置应该使用计算过的\n    v_LDirection=u_LPosition-gl_Position.xyz;\n\n    v_normal=a_normal;\n\n  }\n</script>\n\n<!-- 片段着色器 -->\n<script type='x-shader/x-fragment' id='fs'>\n  precision mediump float;\n  uniform vec4 u_LColor;  // 光颜色\n  uniform vec4 u_color; // 顶点颜色\n  varying vec3 v_LDirection; // 光线方向\n  varying vec3 v_normal; // 法线方向\n\n  void main(){\n\n    // 先对方向进行序列化，使得向量长度为1\n    vec3 LDirection=normalize(v_LDirection);\n    vec3 normal=normalize(v_normal);\n\n    // 计算序列化后的光方向和法线方向的点乘\n    float dotValue=max(dot(LDirection,normal),0.2);\n\n    gl_FragColor=u_color*u_LColor*dotValue;\n\n  }\n</script>\n\n<canvas width='500' height='500'></canvas>\n\n<a href=\"https://github.com/clunch-contrib/robot-3d\" target=\"_blank\" class='fork'>Fork Me on Github</a>\n\n<div class=\"tips\">\n    温馨提示：你可以通过键盘的方向键等来控制物体的旋转等~\n    <div>\n        （本项目基于\n        <a href=\"https://hai2007.gitee.io/image3d/\" target=\"_blank\">image3D.js</a>\n        实现，用于探索模型数据等技术）\n    </div>\n</div>\n\n<div class=\"process\" ui-bind:load='hadLoad?\"yes\":\"no\"'>\n    <span class='icon'>\n        <i ui-bind:style='\"width:\"+process+\"%\"'></i>\n    </span>\n    <br />\n    <span ui-bind='\"模型数据载入中：\"+process+\"%\"'></span>\n</div>\n"
+    __etcpack__scope_bundle__.default= "<!-- 顶点着色器 -->\n<script type='x-shader/x-vertex' id='vs'>\n  attribute vec3 a_position; // 顶点坐标\n  uniform mat4 u_matrix; // 变换矩阵\n  uniform vec3 u_LPosition; // 光的位置\n  attribute vec3 a_normal;\n\n  varying vec3 v_LDirection;\n  varying vec3 v_normal;\n\n  void main(){\n\n    // 坐标新增齐次坐标，为了和矩阵对齐\n    gl_Position=u_matrix * vec4(a_position,1);\n\n    // 点光源方向计算：点光源方向 = 点光源坐标 - 顶点坐标\n    // 顶点的位置应该使用计算过的\n    v_LDirection=u_LPosition-gl_Position.xyz;\n\n    v_normal=a_normal;\n\n  }\n</script>\n\n<!-- 片段着色器 -->\n<script type='x-shader/x-fragment' id='fs'>\n  precision mediump float;\n  uniform vec4 u_LColor;  // 光颜色\n  uniform vec4 u_color; // 顶点颜色\n  varying vec3 v_LDirection; // 光线方向\n  varying vec3 v_normal; // 法线方向\n\n  void main(){\n\n    // 先对方向进行序列化，使得向量长度为1\n    vec3 LDirection=normalize(v_LDirection);\n    vec3 normal=normalize(v_normal);\n\n    // 计算序列化后的光方向和法线方向的点乘\n    float dotValue=max(dot(LDirection,normal),0.2);\n\n    gl_FragColor=u_color*u_LColor*dotValue;\n\n  }\n</script>\n\n<canvas width='500' height='500'></canvas>\n\n<a href=\"https://github.com/clunch-contrib/robot-3d\" target=\"_blank\" class='fork'>Fork Me on Github</a>\n\n<div class=\"tips\">\n    温馨提示：你可以通过键盘的方向键或鼠标拖动等来控制物体的旋转等~\n    <div>\n        （本项目基于\n        <a href=\"https://hai2007.gitee.io/image3d/\" target=\"_blank\">image3D.js</a>\n        实现，用于探索模型数据等技术）\n    </div>\n</div>\n\n<div class=\"process\" ui-bind:load='hadLoad?\"yes\":\"no\"'>\n    <span class='icon'>\n        <i ui-bind:style='\"width:\"+process+\"%\"'></i>\n    </span>\n    <br />\n    <span ui-bind='\"模型数据载入中：\"+process+\"%\"'></span>\n</div>\n"
   
     return __etcpack__scope_bundle__;
 }

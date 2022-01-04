@@ -1,13 +1,13 @@
 {
   "name": "robot-3d",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "3d机器人模型演示",
   "scripts": {
     "build": "nodejs -e build && etcpack_pkg --config etcpack.prod.js",
     "dev": "etcpack_dev --config etcpack.dev.js"
   },
   "dependencies": {
-    "@hai2007/browser": "^0.3.0",
+    "@hai2007/browser": "^0.3.1",
     "@hai2007/polyfill": "^0.2.0",
     "@hai2007/style": "^0.3.0",
     "@hai2007/xhr": "^0.1.2",
