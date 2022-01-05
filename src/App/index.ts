@@ -21,12 +21,15 @@ export default class {
     process: number
     hadLoad: boolean
     flag: boolean
+    size: number
 
     $setup() {
+
         return {
             process: ref(0),
             hadLoad: ref(false),
-            flag: ref(true)
+            flag: ref(true),
+            size: ref(window.innerWidth > window.innerHeight ? window.innerHeight : window.innerWidth)
         }
     }
 
@@ -49,8 +52,12 @@ export default class {
 
             this.hadLoad = true
 
-            // 成功回调
-            this.doit(JSON.parse(data.data))
+            // 异步是为了兼容safari浏览器
+            setTimeout(() => {
+
+                // 成功回调
+                this.doit(JSON.parse(data.data))
+            })
 
         }, (error) => {
 
@@ -138,10 +145,13 @@ export default class {
 
         // 每次调整的弧度
         let deg = 0.1
+        let rateScale = 1
 
         viewHandler(data => {
 
-            this.flag = false;
+            // 部分操作的时候，消除自动动画会比较好看
+            if (['lookUp', 'lookDown', 'lookLeft', 'lookRight', 'rotate'].indexOf(data.type) > -1)
+                this.flag = false;
 
             /*
              * 修改相机
@@ -158,9 +168,25 @@ export default class {
                 camera.rotateBody(deg, 0, -1, 0)
             }
 
-            // 鼠标控制
+            // 鼠标拖动或手指控制
             else if (data.type == 'rotate') {
                 camera.rotateBody(deg * data.dist * 0.07, ...data.normal)
+            }
+
+            // 滚轮控制
+            else if (data.type == 'scale') {
+
+                // 设置一个缩放上界
+                if (data.kind == 'enlarge' && rateScale >= 1.28) {
+                    return
+                }
+
+                let baseTimes = 0.993
+
+                let times = data.kind == 'enlarge' ? 2 - baseTimes : baseTimes
+                rateScale *= times
+
+                camera.scaleBody(times, times, times, 0, 0, 0)
             }
 
             // 重新绘制

@@ -1,6 +1,5 @@
 canvas {
-    margin-top: calc(50vh - 250px);
-    margin-left: calc(50vw - 250px);
+    margin-left: calc(50vw - 50vmin);
 }
 
 .fork {
@@ -28,6 +27,7 @@ canvas {
     left: 20px;
     top: 20px;
     background-color: white;
+    width: 400px;
 
     &>div {
         font-size: 12px;

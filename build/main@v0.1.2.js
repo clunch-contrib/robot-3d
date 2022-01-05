@@ -2844,6 +2844,8 @@ var _class = (_dec = Component({
     _defineProperty(this, "hadLoad", void 0);
 
     _defineProperty(this, "flag", void 0);
+
+    _defineProperty(this, "size", void 0);
   }
 
   _createClass(_class2, [{
@@ -2852,7 +2854,8 @@ var _class = (_dec = Component({
       return {
         process: ref(0),
         hadLoad: ref(false),
-        flag: ref(true)
+        flag: ref(true),
+        size: ref(window.innerWidth > window.innerHeight ? window.innerHeight : window.innerWidth)
       };
     }
   }, {
@@ -2874,9 +2877,12 @@ var _class = (_dec = Component({
           return xmlhttp;
         }
       }, function (data) {
-        _this.hadLoad = true; // 成功回调
+        _this.hadLoad = true; // 异步是为了兼容safari浏览器
 
-        _this.doit(JSON.parse(data.data));
+        setTimeout(function () {
+          // 成功回调
+          _this.doit(JSON.parse(data.data));
+        });
       }, function (error) {
         // 错误回调
         console.error(error);
@@ -2951,8 +2957,10 @@ var _class = (_dec = Component({
       doDraw(); // 每次调整的弧度
 
       var deg = 0.1;
+      var rateScale = 1;
       viewHandler(function (data) {
-        _this2.flag = false;
+        // 部分操作的时候，消除自动动画会比较好看
+        if (['lookUp', 'lookDown', 'lookLeft', 'lookRight', 'rotate'].indexOf(data.type) > -1) _this2.flag = false;
         /*
          * 修改相机
          */
@@ -2966,9 +2974,20 @@ var _class = (_dec = Component({
           camera.rotateBody(deg, 0, 1, 0);
         } else if (data.type == 'lookRight') {
           camera.rotateBody(deg, 0, -1, 0);
-        } // 鼠标控制
+        } // 鼠标拖动或手指控制
         else if (data.type == 'rotate') {
           camera.rotateBody.apply(camera, [deg * data.dist * 0.07].concat(_toConsumableArray(data.normal)));
+        } // 滚轮控制
+        else if (data.type == 'scale') {
+          // 设置一个缩放上界
+          if (data.kind == 'enlarge' && rateScale >= 1.28) {
+            return;
+          }
+
+          var baseTimes = 0.993;
+          var times = data.kind == 'enlarge' ? 2 - baseTimes : baseTimes;
+          rateScale *= times;
+          camera.scaleBody(times, times, times, 0, 0, 0);
         } // 重新绘制
 
 
@@ -3174,6 +3193,29 @@ __etcpack__scope_bundle__.default= function (callback) {
     xhtml.bind(el, 'touchmove', function (event) {
         doMove(event.touches[0]);
     });
+
+    let doScale = function (value) {
+        if (value == 0) return;
+
+        callback({
+            type: "scale",
+            kind: value < 0 ? "reduce" : "enlarge",
+            rate: Math.abs(value),
+        });
+    };
+
+    // 滚轮控制
+    xhtml.bind(el, 'mousewheel', function (event) {
+        doScale(event.wheelDelta);
+    });
+
+    if (window.addEventListener) {
+
+        // 针对火狐浏览器
+        window.addEventListener('DOMMouseScroll', function (event) {
+            doScale(-1 * event.detail);
+        }, false);
+    }
 
 };
 
@@ -3614,7 +3656,7 @@ window.__etcpack__bundleSrc__['25']=function(){
 window.__etcpack__bundleSrc__['26']=function(){
     var __etcpack__scope_bundle__={};
     var __etcpack__scope_args__;
-    __etcpack__scope_bundle__.default= "\n canvas{\n\nmargin-top: calc(50vh - 250px);\n\nmargin-left: calc(50vw - 250px);\n\n}\n\n .fork{\n\nuser-select: none;\n\nposition: fixed;\n\ntransform: rotate(45deg);\n\nline-height: 1.6em;\n\ntransform-origin: 150px 23px;\n\ntext-align: center;\n\nfont-family: sans-serif;\n\ndisplay: inline-block;\n\nbottom: 53px;\n\nleft: -91px;\n\nwidth: 300px;\n\nbackground-color: #b25932;\n\noutline: 4px solid #b25932;\n\nborder: 2px dashed #ffffff;\n\ncolor: #ffffff;\n\n}\n\n .tips{\n\npadding: 10px;\n\ncolor: #b25932;\n\nposition: fixed;\n\nleft: 20px;\n\ntop: 20px;\n\nbackground-color: white;\n\n}\n\n .tips>div{\n\nfont-size: 12px;\n\nmargin-top: 20px;\n\ncolor: black;\n\n}\n\n .tips>div>a{\n\ntext-decoration: underline;\n\n}\n\n .process{\n\ncolor: white;\n\ntop: calc(50vh - 25px);\n\nleft: calc(50vw - 250px);\n\nposition: fixed;\n\ntext-align: center;\n\nwidth: 500px;\n\nheight: 50px;\n\n}\n\n .process>span.icon{\n\nborder: 2px solid gray;\n\nborder-radius: 10px;\n\nwidth: 300px;\n\nheight: 24px;\n\npadding: 2px;\n\ndisplay: inline-block;\n\ntext-align: left;\n\nmargin-bottom: 10px;\n\n}\n\n .process>span.icon>i{\n\nbackground-color: #73c944;\n\ndisplay: inline-block;\n\nheight: 16px;\n\nborder-radius: 10px;\n\n}\n\n .process[load='yes']{\n\ndisplay: none;\n\n}\n\n .animation{\n\nposition: fixed;\n\ntop: 0;\n\nright: 0;\n\ncolor: rgb(0, 0, 0);\n\nbackground-color: white;\n\nmargin: 10px;\n\nwidth: 200px;\n\nline-height: 50px;\n\ncursor: pointer;\n\n}\n\n .animation[load='no']{\n\ndisplay: none;\n\n}\n\n .animation[active='no'] .yes{\n\ndisplay: none;\n\n}\n\n .animation[active='yes']>button{\n\nbackground-color: red;\n\n}\n\n .animation[active='yes'] .no{\n\ndisplay: none;\n\n}\n\n .animation>button{\n\nmargin: 0 10px;\n\nwidth: 20px;\n\nheight: 20px;\n\nfont-size: 0;\n\nborder-radius: 50%;\n\nvertical-align: text-bottom;\n\n}\n\n .animation>span{\n\ndisplay: inline-block;\n\nwidth: 100px;\n\n}\n"
+    __etcpack__scope_bundle__.default= "\n canvas{\n\nmargin-left: calc(50vw - 50vmin);\n\n}\n\n .fork{\n\nuser-select: none;\n\nposition: fixed;\n\ntransform: rotate(45deg);\n\nline-height: 1.6em;\n\ntransform-origin: 150px 23px;\n\ntext-align: center;\n\nfont-family: sans-serif;\n\ndisplay: inline-block;\n\nbottom: 53px;\n\nleft: -91px;\n\nwidth: 300px;\n\nbackground-color: #b25932;\n\noutline: 4px solid #b25932;\n\nborder: 2px dashed #ffffff;\n\ncolor: #ffffff;\n\n}\n\n .tips{\n\npadding: 10px;\n\ncolor: #b25932;\n\nposition: fixed;\n\nleft: 20px;\n\ntop: 20px;\n\nbackground-color: white;\n\nwidth: 400px;\n\n}\n\n .tips>div{\n\nfont-size: 12px;\n\nmargin-top: 20px;\n\ncolor: black;\n\n}\n\n .tips>div>a{\n\ntext-decoration: underline;\n\n}\n\n .process{\n\ncolor: white;\n\ntop: calc(50vh - 25px);\n\nleft: calc(50vw - 250px);\n\nposition: fixed;\n\ntext-align: center;\n\nwidth: 500px;\n\nheight: 50px;\n\n}\n\n .process>span.icon{\n\nborder: 2px solid gray;\n\nborder-radius: 10px;\n\nwidth: 300px;\n\nheight: 24px;\n\npadding: 2px;\n\ndisplay: inline-block;\n\ntext-align: left;\n\nmargin-bottom: 10px;\n\n}\n\n .process>span.icon>i{\n\nbackground-color: #73c944;\n\ndisplay: inline-block;\n\nheight: 16px;\n\nborder-radius: 10px;\n\n}\n\n .process[load='yes']{\n\ndisplay: none;\n\n}\n\n .animation{\n\nposition: fixed;\n\ntop: 0;\n\nright: 0;\n\ncolor: rgb(0, 0, 0);\n\nbackground-color: white;\n\nmargin: 10px;\n\nwidth: 200px;\n\nline-height: 50px;\n\ncursor: pointer;\n\n}\n\n .animation[load='no']{\n\ndisplay: none;\n\n}\n\n .animation[active='no'] .yes{\n\ndisplay: none;\n\n}\n\n .animation[active='yes']>button{\n\nbackground-color: red;\n\n}\n\n .animation[active='yes'] .no{\n\ndisplay: none;\n\n}\n\n .animation>button{\n\nmargin: 0 10px;\n\nwidth: 20px;\n\nheight: 20px;\n\nfont-size: 0;\n\nborder-radius: 50%;\n\nvertical-align: text-bottom;\n\n}\n\n .animation>span{\n\ndisplay: inline-block;\n\nwidth: 100px;\n\n}\n"
   
     return __etcpack__scope_bundle__;
 }
@@ -3625,7 +3667,7 @@ window.__etcpack__bundleSrc__['26']=function(){
 window.__etcpack__bundleSrc__['27']=function(){
     var __etcpack__scope_bundle__={};
     var __etcpack__scope_args__;
-    __etcpack__scope_bundle__.default= "<canvas width='500' height='500'></canvas>\n\n<a href=\"https://github.com/clunch-contrib/robot-3d\" target=\"_blank\" class='fork'>Fork Me on Github</a>\n\n<div class=\"tips\">\n    温馨提示：你可以通过键盘的方向键或鼠标拖动等来控制物体的旋转等~\n    <div>\n        （本项目基于\n        <a href=\"https://hai2007.gitee.io/image3d/\" target=\"_blank\">image3D.js</a>\n        实现，用于探索模型数据等技术）\n    </div>\n</div>\n\n<div class=\"process\" ui-bind:load='hadLoad?\"yes\":\"no\"'>\n    <span class='icon'>\n        <i ui-bind:style='\"width:\"+process+\"%\"'></i>\n    </span>\n    <br />\n    <span ui-bind='\"模型数据载入中：\"+process+\"%\"'></span>\n</div>\n\n<div class='animation' ui-on:click='ctrlFlag' ui-bind:active='flag?\"yes\":\"no\"' ui-bind:load='hadLoad?\"yes\":\"no\"'>\n    <button>控制</button>\n    <span class='yes'>动画运行中</span>\n    <span class='no'>动画停止</span>\n</div>\n"
+    __etcpack__scope_bundle__.default= "<canvas ui-bind:width='size' ui-bind:height='size'></canvas>\n\n<a href=\"https://github.com/clunch-contrib/robot-3d\" target=\"_blank\" class='fork'>Fork Me on Github</a>\n\n<div class=\"tips\">\n    温馨提示：你可以通过键盘的方向键或鼠标拖动和滚动等来控制物体的旋转、缩放等~\n    <div>\n        （本项目基于\n        <a href=\"https://hai2007.gitee.io/image3d/\" target=\"_blank\">image3D.js</a>\n        实现，用于探索模型数据等技术）\n    </div>\n</div>\n\n<div class=\"process\" ui-bind:load='hadLoad?\"yes\":\"no\"'>\n    <span class='icon'>\n        <i ui-bind:style='\"width:\"+process+\"%\"'></i>\n    </span>\n    <br />\n    <span ui-bind='\"模型数据载入中：\"+process+\"%\"'></span>\n</div>\n\n<div class='animation' ui-on:click='ctrlFlag' ui-bind:active='flag?\"yes\":\"no\"' ui-bind:load='hadLoad?\"yes\":\"no\"'>\n    <button>控制</button>\n    <span class='yes'>动画运行中</span>\n    <span class='no'>动画停止</span>\n</div>\n"
   
     return __etcpack__scope_bundle__;
 }
