@@ -2984,7 +2984,7 @@ var _class = (_dec = Component({
             return;
           }
 
-          var baseTimes = 0.993;
+          var baseTimes = 0.899;
           var times = data.kind == 'enlarge' ? 2 - baseTimes : baseTimes;
           rateScale *= times;
           camera.scaleBody(times, times, times, 0, 0, 0);

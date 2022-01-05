@@ -7,6 +7,8 @@
 # [robot-3d](https://clunch-contrib.github.io/robot-3d/)
 3d机器人模型演示
 
+> 本项目基于[image3D.js](https://hai2007.gitee.io/image3d/)实现，用于探索模型数据等技术~
+
 ## 如何启动本地编辑？
 
 首先，你需要确保本地安装了node.js，然后，执行下面命令安装项目依赖：

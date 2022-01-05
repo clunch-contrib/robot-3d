@@ -181,7 +181,7 @@ export default class {
                     return
                 }
 
-                let baseTimes = 0.993
+                let baseTimes = 0.899
 
                 let times = data.kind == 'enlarge' ? 2 - baseTimes : baseTimes
                 rateScale *= times
