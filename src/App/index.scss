@@ -73,3 +73,46 @@ canvas {
         display: none;
     }
 }
+
+.animation {
+    position: fixed;
+    top: 0;
+    right: 0;
+    color: rgb(0, 0, 0);
+    background-color: white;
+    margin: 10px;
+    width: 200px;
+    line-height: 50px;
+    cursor: pointer;
+
+    &[active='no'] {
+        .yes {
+            display: none;
+        }
+    }
+
+    &[active='yes'] {
+        &>button {
+            background-color: red;
+        }
+
+        .no {
+            display: none;
+        }
+    }
+
+    &>button {
+        margin: 0 10px;
+        width: 20px;
+        height: 20px;
+        font-size: 0;
+        border-radius: 50%;
+        vertical-align: text-bottom;
+    }
+
+    &>span {
+        display: inline-block;
+        width: 100px;
+    }
+
+}

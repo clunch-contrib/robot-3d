@@ -5,6 +5,9 @@ import image3D from 'image3d'
 
 import viewHandler from '@hai2007/browser/viewHandler.js'
 
+import vertexShader from './shader-vertex.c'
+import fragmentShader from './shader-fragment.c'
+
 import style from './index.scss'
 import template from './index.html'
 
@@ -17,11 +20,13 @@ export default class {
 
     process: number
     hadLoad: boolean
+    flag: boolean
 
     $setup() {
         return {
             process: ref(0),
-            hadLoad: ref(false)
+            hadLoad: ref(false),
+            flag: ref(true)
         }
     }
 
@@ -57,12 +62,16 @@ export default class {
 
     }
 
+    ctrlFlag() {
+        this.flag = !this.flag
+    }
+
     doit(model) {
 
         // 创建3D对象并配置好画布和着色器
         let image3d = new image3D(document.getElementsByTagName('canvas')[0], {
-            "vertex-shader": document.getElementById("vs").innerText,
-            "fragment-shader": document.getElementById("fs").innerText,
+            "vertex-shader": vertexShader,
+            "fragment-shader": fragmentShader,
             depth: true
         })
 
@@ -92,10 +101,11 @@ export default class {
 
         // 设置点光源的颜色和位置
         image3d.setUniformFloat("u_LColor", 1, 1, 1, 1)
-        image3d.setUniformFloat("u_LPosition", 10, 10, 10)
+        image3d.setUniformFloat("u_LPosition", -5, 5, -5)
 
         let doDraw = function () {
             image3d.setUniformMatrix("u_matrix", camera.value())
+
             for (let index = 0; index < model.geometries.length; index++) {
 
                 image3d.setUniformFloat("u_color", ...(colors[index] || [0.8, 0.8, 0.8]), 1)
@@ -131,6 +141,8 @@ export default class {
 
         viewHandler(data => {
 
+            this.flag = false;
+
             /*
              * 修改相机
              */
@@ -154,6 +166,17 @@ export default class {
             // 重新绘制
             doDraw()
         })
+
+        setInterval(() => {
+
+            if (!this.flag) return
+
+            // 传递照相机
+            image3d.setUniformMatrix("u_matrix", camera.rotateBody(0.02, -1, 1, 0, 1, -1, 0).value())
+
+            doDraw()
+
+        }, 20)
 
     }
 

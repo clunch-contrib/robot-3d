@@ -1,49 +1,3 @@
-<!-- 顶点着色器 -->
-<script type='x-shader/x-vertex' id='vs'>
-  attribute vec3 a_position; // 顶点坐标
-  uniform mat4 u_matrix; // 变换矩阵
-  uniform vec3 u_LPosition; // 光的位置
-  attribute vec3 a_normal;
-
-  varying vec3 v_LDirection;
-  varying vec3 v_normal;
-
-  void main(){
-
-    // 坐标新增齐次坐标，为了和矩阵对齐
-    gl_Position=u_matrix * vec4(a_position,1);
-
-    // 点光源方向计算：点光源方向 = 点光源坐标 - 顶点坐标
-    // 顶点的位置应该使用计算过的
-    v_LDirection=u_LPosition-gl_Position.xyz;
-
-    v_normal=a_normal;
-
-  }
-</script>
-
-<!-- 片段着色器 -->
-<script type='x-shader/x-fragment' id='fs'>
-  precision mediump float;
-  uniform vec4 u_LColor;  // 光颜色
-  uniform vec4 u_color; // 顶点颜色
-  varying vec3 v_LDirection; // 光线方向
-  varying vec3 v_normal; // 法线方向
-
-  void main(){
-
-    // 先对方向进行序列化，使得向量长度为1
-    vec3 LDirection=normalize(v_LDirection);
-    vec3 normal=normalize(v_normal);
-
-    // 计算序列化后的光方向和法线方向的点乘
-    float dotValue=max(dot(LDirection,normal),0.2);
-
-    gl_FragColor=u_color*u_LColor*dotValue;
-
-  }
-</script>
-
 <canvas width='500' height='500'></canvas>
 
 <a href="https://github.com/clunch-contrib/robot-3d" target="_blank" class='fork'>Fork Me on Github</a>
@@ -63,4 +17,10 @@
     </span>
     <br />
     <span ui-bind='"模型数据载入中："+process+"%"'></span>
+</div>
+
+<div class='animation' ui-on:click='ctrlFlag' ui-bind:active='flag?"yes":"no"'>
+    <button>控制</button>
+    <span class='yes'>动画运行中</span>
+    <span class='no'>动画停止</span>
 </div>

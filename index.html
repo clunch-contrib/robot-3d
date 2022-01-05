@@ -6,9 +6,11 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="shortcut icon" href="./logo.png">
     <title>robot-3d | 3d机器人模型演示</title>
+    <!-- <script type="text/javascript" src="./static/spector.js"></script> -->
     <style>
-        body{
+        body {
             height: 100vh;
+            user-select: none;
         }
     </style>
 </head>
@@ -28,7 +30,7 @@
         var script = document.createElement('script');
 
         // 设置属性
-        script.src = "./build/main@v0.1.1.js";
+        script.src = "./build/main@v0.1.2.js";
 
         if (/^127\.0\.0\.1/.test(host) || /^localhost/.test(host)) {
             script.type = 'module';
@@ -36,6 +38,13 @@
 
         // 追加到页面
         head.appendChild(script);
+
+        // script.addEventListener('load', function () {
+
+        //     var spector = new SPECTOR.Spector();
+        //     spector.displayUI();
+
+        // }, false);
 
     </script>
 

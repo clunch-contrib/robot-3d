@@ -2753,13 +2753,13 @@ __etcpack__scope_args__=window.__etcpack__getBundle('18');
 var AppComponent =__etcpack__scope_args__.default;
  // 指令
 
-__etcpack__scope_args__=window.__etcpack__getBundle('26');
+__etcpack__scope_args__=window.__etcpack__getBundle('28');
 var uiBind =__etcpack__scope_args__.default;
 
-__etcpack__scope_args__=window.__etcpack__getBundle('27');
+__etcpack__scope_args__=window.__etcpack__getBundle('29');
 var uiModel =__etcpack__scope_args__.default;
 
-__etcpack__scope_args__=window.__etcpack__getBundle('28');
+__etcpack__scope_args__=window.__etcpack__getBundle('30');
 var uiOn =__etcpack__scope_args__.default;
 
 
@@ -2819,9 +2819,15 @@ __etcpack__scope_args__=window.__etcpack__getBundle('21');
 var viewHandler =__etcpack__scope_args__.default;
 
 __etcpack__scope_args__=window.__etcpack__getBundle('24');
-var style =__etcpack__scope_args__.default;
+var vertexShader =__etcpack__scope_args__.default;
 
 __etcpack__scope_args__=window.__etcpack__getBundle('25');
+var fragmentShader =__etcpack__scope_args__.default;
+
+__etcpack__scope_args__=window.__etcpack__getBundle('26');
+var style =__etcpack__scope_args__.default;
+
+__etcpack__scope_args__=window.__etcpack__getBundle('27');
 var template =__etcpack__scope_args__.default;
 
 
@@ -2836,6 +2842,8 @@ var _class = (_dec = Component({
     _defineProperty(this, "process", void 0);
 
     _defineProperty(this, "hadLoad", void 0);
+
+    _defineProperty(this, "flag", void 0);
   }
 
   _createClass(_class2, [{
@@ -2843,7 +2851,8 @@ var _class = (_dec = Component({
     value: function $setup() {
       return {
         process: ref(0),
-        hadLoad: ref(false)
+        hadLoad: ref(false),
+        flag: ref(true)
       };
     }
   }, {
@@ -2875,12 +2884,19 @@ var _class = (_dec = Component({
       });
     }
   }, {
+    key: "ctrlFlag",
+    value: function ctrlFlag() {
+      this.flag = !this.flag;
+    }
+  }, {
     key: "doit",
     value: function doit(model) {
+      var _this2 = this;
+
       // 创建3D对象并配置好画布和着色器
       var image3d = new image3D(document.getElementsByTagName('canvas')[0], {
-        "vertex-shader": document.getElementById("vs").innerText,
-        "fragment-shader": document.getElementById("fs").innerText,
+        "vertex-shader": vertexShader,
+        "fragment-shader": fragmentShader,
         depth: true
       });
       var painter = image3d.Painter();
@@ -2907,7 +2923,7 @@ var _class = (_dec = Component({
       }; // 设置点光源的颜色和位置
 
       image3d.setUniformFloat("u_LColor", 1, 1, 1, 1);
-      image3d.setUniformFloat("u_LPosition", 10, 10, 10);
+      image3d.setUniformFloat("u_LPosition", -5, 5, -5);
 
       var doDraw = function doDraw() {
         image3d.setUniformMatrix("u_matrix", camera.value());
@@ -2936,10 +2952,12 @@ var _class = (_dec = Component({
 
       var deg = 0.1;
       viewHandler(function (data) {
+        _this2.flag = false;
         /*
          * 修改相机
          */
         // 键盘控制
+
         if (data.type == 'lookUp') {
           camera.rotateBody(deg, 1, 0, 0);
         } else if (data.type == 'lookDown') {
@@ -2956,6 +2974,12 @@ var _class = (_dec = Component({
 
         doDraw();
       });
+      setInterval(function () {
+        if (!_this2.flag) return; // 传递照相机
+
+        image3d.setUniformMatrix("u_matrix", camera.rotateBody(0.02, -1, 1, 0, 1, -1, 0).value());
+        doDraw();
+      }, 20);
     }
   }]);
 
@@ -3563,12 +3587,34 @@ __etcpack__scope_bundle__.default= function (event) {
 }
 
 /*************************** [bundle] ****************************/
-// Original file:./src/App/index.scss
+// Original file:./src/App/shader-vertex.c
 /*****************************************************************/
 window.__etcpack__bundleSrc__['24']=function(){
     var __etcpack__scope_bundle__={};
     var __etcpack__scope_args__;
-    __etcpack__scope_bundle__.default= "\n canvas{\n\nmargin-top: calc(50vh - 250px);\n\nmargin-left: calc(50vw - 250px);\n\n}\n\n .fork{\n\nuser-select: none;\n\nposition: fixed;\n\ntransform: rotate(45deg);\n\nline-height: 1.6em;\n\ntransform-origin: 150px 23px;\n\ntext-align: center;\n\nfont-family: sans-serif;\n\ndisplay: inline-block;\n\nbottom: 53px;\n\nleft: -91px;\n\nwidth: 300px;\n\nbackground-color: #b25932;\n\noutline: 4px solid #b25932;\n\nborder: 2px dashed #ffffff;\n\ncolor: #ffffff;\n\n}\n\n .tips{\n\npadding: 10px;\n\ncolor: #b25932;\n\nposition: fixed;\n\nleft: 20px;\n\ntop: 20px;\n\nbackground-color: white;\n\n}\n\n .tips>div{\n\nfont-size: 12px;\n\nmargin-top: 20px;\n\ncolor: black;\n\n}\n\n .tips>div>a{\n\ntext-decoration: underline;\n\n}\n\n .process{\n\ncolor: white;\n\ntop: calc(50vh - 25px);\n\nleft: calc(50vw - 250px);\n\nposition: fixed;\n\ntext-align: center;\n\nwidth: 500px;\n\nheight: 50px;\n\n}\n\n .process>span.icon{\n\nborder: 2px solid gray;\n\nborder-radius: 10px;\n\nwidth: 300px;\n\nheight: 24px;\n\npadding: 2px;\n\ndisplay: inline-block;\n\ntext-align: left;\n\nmargin-bottom: 10px;\n\n}\n\n .process>span.icon>i{\n\nbackground-color: #73c944;\n\ndisplay: inline-block;\n\nheight: 16px;\n\nborder-radius: 10px;\n\n}\n\n .process[load='yes']{\n\ndisplay: none;\n\n}\n"
+    __etcpack__scope_bundle__.default= "attribute vec3 a_position; // 顶点坐标\nuniform mat4 u_matrix;     // 变换矩阵\nuniform vec3 u_LPosition;  // 光的位置\nattribute vec3 a_normal;\n\nvarying vec3 v_LDirection;\nvarying vec3 v_normal;\n\nvoid main()\n{\n\n    // 坐标新增齐次坐标，为了和矩阵对齐\n    gl_Position = u_matrix * vec4(a_position, 1);\n\n    // 点光源方向\n    // 顶点的位置应该使用计算过的\n    v_LDirection = vec3(gl_Position) - u_LPosition;\n\n    v_normal = vec3(u_matrix * vec4(a_normal, 1));\n}\n"
+  
+    return __etcpack__scope_bundle__;
+}
+
+/*************************** [bundle] ****************************/
+// Original file:./src/App/shader-fragment.c
+/*****************************************************************/
+window.__etcpack__bundleSrc__['25']=function(){
+    var __etcpack__scope_bundle__={};
+    var __etcpack__scope_args__;
+    __etcpack__scope_bundle__.default= "precision mediump float;\n\nuniform vec4 u_LColor; // 光颜色\nuniform vec4 u_color;  // 顶点颜色\n\nvarying vec3 v_LDirection; // 光线方向\nvarying vec3 v_normal;     // 法线方向\n\nvoid main()\n{\n\n    // 先对方向进行序列化，使得向量长度为1\n    vec3 LDirection = normalize(v_LDirection);\n    vec3 normal = normalize(v_normal);\n\n    // 计算序列化后的光方向和法线方向的点乘\n    float dotValue = max(dot(LDirection, normal), 0.2);\n\n    gl_FragColor = u_color * u_LColor * dotValue;\n}\n"
+  
+    return __etcpack__scope_bundle__;
+}
+
+/*************************** [bundle] ****************************/
+// Original file:./src/App/index.scss
+/*****************************************************************/
+window.__etcpack__bundleSrc__['26']=function(){
+    var __etcpack__scope_bundle__={};
+    var __etcpack__scope_args__;
+    __etcpack__scope_bundle__.default= "\n canvas{\n\nmargin-top: calc(50vh - 250px);\n\nmargin-left: calc(50vw - 250px);\n\n}\n\n .fork{\n\nuser-select: none;\n\nposition: fixed;\n\ntransform: rotate(45deg);\n\nline-height: 1.6em;\n\ntransform-origin: 150px 23px;\n\ntext-align: center;\n\nfont-family: sans-serif;\n\ndisplay: inline-block;\n\nbottom: 53px;\n\nleft: -91px;\n\nwidth: 300px;\n\nbackground-color: #b25932;\n\noutline: 4px solid #b25932;\n\nborder: 2px dashed #ffffff;\n\ncolor: #ffffff;\n\n}\n\n .tips{\n\npadding: 10px;\n\ncolor: #b25932;\n\nposition: fixed;\n\nleft: 20px;\n\ntop: 20px;\n\nbackground-color: white;\n\n}\n\n .tips>div{\n\nfont-size: 12px;\n\nmargin-top: 20px;\n\ncolor: black;\n\n}\n\n .tips>div>a{\n\ntext-decoration: underline;\n\n}\n\n .process{\n\ncolor: white;\n\ntop: calc(50vh - 25px);\n\nleft: calc(50vw - 250px);\n\nposition: fixed;\n\ntext-align: center;\n\nwidth: 500px;\n\nheight: 50px;\n\n}\n\n .process>span.icon{\n\nborder: 2px solid gray;\n\nborder-radius: 10px;\n\nwidth: 300px;\n\nheight: 24px;\n\npadding: 2px;\n\ndisplay: inline-block;\n\ntext-align: left;\n\nmargin-bottom: 10px;\n\n}\n\n .process>span.icon>i{\n\nbackground-color: #73c944;\n\ndisplay: inline-block;\n\nheight: 16px;\n\nborder-radius: 10px;\n\n}\n\n .process[load='yes']{\n\ndisplay: none;\n\n}\n\n .animation{\n\nposition: fixed;\n\ntop: 0;\n\nright: 0;\n\ncolor: rgb(0, 0, 0);\n\nbackground-color: white;\n\nmargin: 10px;\n\nwidth: 200px;\n\nline-height: 50px;\n\ncursor: pointer;\n\n}\n\n .animation[active='no'] .yes{\n\ndisplay: none;\n\n}\n\n .animation[active='yes']>button{\n\nbackground-color: red;\n\n}\n\n .animation[active='yes'] .no{\n\ndisplay: none;\n\n}\n\n .animation>button{\n\nmargin: 0 10px;\n\nwidth: 20px;\n\nheight: 20px;\n\nfont-size: 0;\n\nborder-radius: 50%;\n\nvertical-align: text-bottom;\n\n}\n\n .animation>span{\n\ndisplay: inline-block;\n\nwidth: 100px;\n\n}\n"
   
     return __etcpack__scope_bundle__;
 }
@@ -3576,10 +3622,10 @@ window.__etcpack__bundleSrc__['24']=function(){
 /*************************** [bundle] ****************************/
 // Original file:./src/App/index.html
 /*****************************************************************/
-window.__etcpack__bundleSrc__['25']=function(){
+window.__etcpack__bundleSrc__['27']=function(){
     var __etcpack__scope_bundle__={};
     var __etcpack__scope_args__;
-    __etcpack__scope_bundle__.default= "<!-- 顶点着色器 -->\r\n<script type='x-shader/x-vertex' id='vs'>\r\n  attribute vec3 a_position; // 顶点坐标\r\n  uniform mat4 u_matrix; // 变换矩阵\r\n  uniform vec3 u_LPosition; // 光的位置\r\n  attribute vec3 a_normal;\r\n\r\n  varying vec3 v_LDirection;\r\n  varying vec3 v_normal;\r\n\r\n  void main(){\r\n\r\n    // 坐标新增齐次坐标，为了和矩阵对齐\r\n    gl_Position=u_matrix * vec4(a_position,1);\r\n\r\n    // 点光源方向计算：点光源方向 = 点光源坐标 - 顶点坐标\r\n    // 顶点的位置应该使用计算过的\r\n    v_LDirection=u_LPosition-gl_Position.xyz;\r\n\r\n    v_normal=a_normal;\r\n\r\n  }\r\n</script>\r\n\r\n<!-- 片段着色器 -->\r\n<script type='x-shader/x-fragment' id='fs'>\r\n  precision mediump float;\r\n  uniform vec4 u_LColor;  // 光颜色\r\n  uniform vec4 u_color; // 顶点颜色\r\n  varying vec3 v_LDirection; // 光线方向\r\n  varying vec3 v_normal; // 法线方向\r\n\r\n  void main(){\r\n\r\n    // 先对方向进行序列化，使得向量长度为1\r\n    vec3 LDirection=normalize(v_LDirection);\r\n    vec3 normal=normalize(v_normal);\r\n\r\n    // 计算序列化后的光方向和法线方向的点乘\r\n    float dotValue=max(dot(LDirection,normal),0.2);\r\n\r\n    gl_FragColor=u_color*u_LColor*dotValue;\r\n\r\n  }\r\n</script>\r\n\r\n<canvas width='500' height='500'></canvas>\r\n\r\n<a href=\"https://github.com/clunch-contrib/robot-3d\" target=\"_blank\" class='fork'>Fork Me on Github</a>\r\n\r\n<div class=\"tips\">\r\n    温馨提示：你可以通过键盘的方向键或鼠标拖动等来控制物体的旋转等~\r\n    <div>\r\n        （本项目基于\r\n        <a href=\"https://hai2007.gitee.io/image3d/\" target=\"_blank\">image3D.js</a>\r\n        实现，用于探索模型数据等技术）\r\n    </div>\r\n</div>\r\n\r\n<div class=\"process\" ui-bind:load='hadLoad?\"yes\":\"no\"'>\r\n    <span class='icon'>\r\n        <i ui-bind:style='\"width:\"+process+\"%\"'></i>\r\n    </span>\r\n    <br />\r\n    <span ui-bind='\"模型数据载入中：\"+process+\"%\"'></span>\r\n</div>\r\n"
+    __etcpack__scope_bundle__.default= "<canvas width='500' height='500'></canvas>\n\n<a href=\"https://github.com/clunch-contrib/robot-3d\" target=\"_blank\" class='fork'>Fork Me on Github</a>\n\n<div class=\"tips\">\n    温馨提示：你可以通过键盘的方向键或鼠标拖动等来控制物体的旋转等~\n    <div>\n        （本项目基于\n        <a href=\"https://hai2007.gitee.io/image3d/\" target=\"_blank\">image3D.js</a>\n        实现，用于探索模型数据等技术）\n    </div>\n</div>\n\n<div class=\"process\" ui-bind:load='hadLoad?\"yes\":\"no\"'>\n    <span class='icon'>\n        <i ui-bind:style='\"width:\"+process+\"%\"'></i>\n    </span>\n    <br />\n    <span ui-bind='\"模型数据载入中：\"+process+\"%\"'></span>\n</div>\n\n<div class='animation' ui-on:click='ctrlFlag' ui-bind:active='flag?\"yes\":\"no\"'>\n    <button>控制</button>\n    <span class='yes'>动画运行中</span>\n    <span class='no'>动画停止</span>\n</div>\n"
   
     return __etcpack__scope_bundle__;
 }
@@ -3587,7 +3633,7 @@ window.__etcpack__bundleSrc__['25']=function(){
 /*************************** [bundle] ****************************/
 // Original file:./node_modules/sprout-ui/nefbl/directive/ui-bind.ts
 /*****************************************************************/
-window.__etcpack__bundleSrc__['26']=function(){
+window.__etcpack__bundleSrc__['28']=function(){
     var __etcpack__scope_bundle__={};
     var __etcpack__scope_args__;
     var _dec, _class2;
@@ -3649,7 +3695,7 @@ __etcpack__scope_bundle__.default=_class;
 /*************************** [bundle] ****************************/
 // Original file:./node_modules/sprout-ui/nefbl/directive/ui-model.ts
 /*****************************************************************/
-window.__etcpack__bundleSrc__['27']=function(){
+window.__etcpack__bundleSrc__['29']=function(){
     var __etcpack__scope_bundle__={};
     var __etcpack__scope_args__;
     var _dec, _class2;
@@ -3701,7 +3747,7 @@ __etcpack__scope_bundle__.default=_class;
 /*************************** [bundle] ****************************/
 // Original file:./node_modules/sprout-ui/nefbl/directive/ui-on.ts
 /*****************************************************************/
-window.__etcpack__bundleSrc__['28']=function(){
+window.__etcpack__bundleSrc__['30']=function(){
     var __etcpack__scope_bundle__={};
     var __etcpack__scope_args__;
     var _dec, _class2;
