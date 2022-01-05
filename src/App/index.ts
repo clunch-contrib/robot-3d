@@ -172,7 +172,7 @@ export default class {
             if (!this.flag) return
 
             // 传递照相机
-            image3d.setUniformMatrix("u_matrix", camera.rotateBody(0.02, -1, 1, 0, 1, -1, 0).value())
+            image3d.setUniformMatrix("u_matrix", camera.rotateBody(0.02, 1, 1, 1).value())
 
             doDraw()
 

@@ -85,6 +85,10 @@ canvas {
     line-height: 50px;
     cursor: pointer;
 
+    &[load='no'] {
+        display: none;
+    }
+
     &[active='no'] {
         .yes {
             display: none;

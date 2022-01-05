@@ -19,7 +19,7 @@
     <span ui-bind='"模型数据载入中："+process+"%"'></span>
 </div>
 
-<div class='animation' ui-on:click='ctrlFlag' ui-bind:active='flag?"yes":"no"'>
+<div class='animation' ui-on:click='ctrlFlag' ui-bind:active='flag?"yes":"no"' ui-bind:load='hadLoad?"yes":"no"'>
     <button>控制</button>
     <span class='yes'>动画运行中</span>
     <span class='no'>动画停止</span>
